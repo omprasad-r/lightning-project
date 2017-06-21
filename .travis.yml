@@ -13,9 +13,10 @@ php:
   - 7.0
 
 env:
-  - VERSION=STABLE TEST_TAGS=lightning
-  - VERSION=HEAD TEST_TAGS=lightning
-  - VERSION=SUBPROFILE TEST_TAGS=~search
+  - VERSION=STABLE TEST_TAGS=lightning PREFER_LOWEST=""
+  - VERSION=HEAD TEST_TAGS=lightning PREFER_LOWEST=""
+  - VERSION=LOWEST TEST_TAGS=lightning PREFER_LOWEST="--prefer-lowest"
+  - VERSION=SUBPROFILE TEST_TAGS=~search PREFER_LOWEST=""
 
 addons:
   apt:
@@ -68,7 +69,7 @@ install:
   - composer require drupal/devel --no-update
 
   # Build the Lightning code base.
-  - composer install
+  - composer install $PREFER_LOWEST
 
   # Install Lightning.
   - cd docroot
