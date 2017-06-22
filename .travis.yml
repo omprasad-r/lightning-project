@@ -70,7 +70,7 @@ install:
 
   # Build the Lightning code base.
   - composer install
-  - if [ $VERSION = "LOWEST"]; then composer update --prefer-lowest; fi;
+  - if [ $VERSION = "LOWEST" ]; then composer update --prefer-lowest; fi;
 
   # Install Lightning.
   - cd docroot
