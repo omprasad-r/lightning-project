@@ -77,13 +77,13 @@ install:
       drupal lightning:subprofile --no-interaction --name="Lightning Extender" --machine-name=subprofile --include=paragraphs --exclude=lightning_search;
       mkdir -p ./tests/features;
       curl -o tests/features/subprofile.feature  https://gist.githubusercontent.com/balsama/c8c03bb21f7a91a1a87d01ef185a3955/raw;
+      curl -o tests/behat.partial.yml https://gist.githubusercontent.com/balsama/3a60df268f76e57da79c7f179cf7ceaa/raw
       chmod +w ./docroot/sites/default/settings.php;
     fi;'
 
   # Install Lightning.
   - lightning install "mysql\://lightning:lightning@127.0.0.1/lightning" lightning "http://127.0.0.1:8080"
   - drush config-set system.logging error_level all --yes
-
 
   # Record the version of Lightning for the Configuration Updates.
   - UPDATE_FROM=$(drupal lightning:version)
@@ -98,8 +98,6 @@ install:
 
   # Generate the behat config.
   - lightning configure:behat http://127.0.0.1:8080
-  # Need to be able to do this with the configure:behat command
-  #- if [ $VERSION = "SUBPROFILE" ]; then drupal behat:include ../tests/features; fi;
   - cd $TRAVIS_BUILD_DIR/docroot
 
 before_script:
