@@ -55,16 +55,13 @@ install:
   - export PATH="$HOME/.composer/vendor/bin:$TRAVIS_BUILD_DIR/vendor/bin:$PATH"
 
   # Create the MySQL database and add a user for testing.
-  - mysql -u root -e "CREATE DATABASE drupal; CREATE USER 'lightning'@'localhost' IDENTIFIED BY 'lightning'; GRANT ALL ON drupal.* TO 'lightning'@'localhost';"
+  - mysql -u root -e "CREATE DATABASE lightning; CREATE USER 'lightning'@'localhost' IDENTIFIED BY 'lightning'; GRANT ALL ON lightning.* TO 'lightning'@'localhost';"
 
   # PHP conf tweaks
   - echo 'max_execution_time = 120' >> drupal.php.ini;
   - echo 'sendmail_path = /bin/true' >> drupal.php.ini;
   - phpenv config-add drupal.php.ini
   - phpenv rehash
-
-  # Add Devel, which is a dependency of Lightning Dev, to the codebase
-  - composer require drupal/devel --no-update
 
   # Build the Lightning code base.
   - composer install
@@ -84,19 +81,14 @@ install:
     fi;'
 
   # Install Lightning.
-  - cd $TRAVIS_BUILD_DIR/docroot
-  - drush site-install $PROFILE_NAME --yes --account-pass=admin --db-url=mysql://lightning:lightning@127.0.0.1/drupal
+  - lightning install "mysql\://lightning:lightning@127.0.0.1/lightning" lightning "http://127.0.0.1:8080"
   - drush config-set system.logging error_level all --yes
 
-  # Enable the dev module which will perform any manual update steps needed
-  # during database updates.
-  - drush pm-enable lightning_dev --yes
 
   # Record the version of Lightning for the Configuration Updates.
   - UPDATE_FROM=$(drupal lightning:version)
 
   # Update codebase to head and run db updates.
-  - cd $TRAVIS_BUILD_DIR
   - composer nuke
   - composer require acquia/lightning:dev-8.x-3.x --no-update
   - composer update
@@ -105,10 +97,9 @@ install:
   - drupal update:lightning $UPDATE_FROM --no-interaction
 
   # Generate the behat config.
-  - cd $TRAVIS_BUILD_DIR
-  - drupal behat:init http://127.0.0.1:8080 --merge=../docroot/profiles/contrib/lightning/tests/behat.yml
-  - drupal behat:include ../docroot/profiles/contrib/lightning/tests/features --with-subcontexts=../docroot/profiles/contrib/lightning/tests/features/bootstrap --with-subcontexts=../docroot/profiles/contrib/lightning/src/LightningExtension/Context
-  - if [ $VERSION = "SUBPROFILE" ]; then drupal behat:include ../tests/features; fi;
+  - lightning configure:behat http://127.0.0.1:8080
+  # Need to be able to do this with the configure:behat command
+  #- if [ $VERSION = "SUBPROFILE" ]; then drupal behat:include ../tests/features; fi;
   - cd $TRAVIS_BUILD_DIR/docroot
 
 before_script:
