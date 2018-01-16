@@ -98,7 +98,6 @@ install:
 
   # Generate the behat config.
   - lightning configure:behat http://127.0.0.1:8080
-  - cd $TRAVIS_BUILD_DIR/docroot
 
 before_script:
   - drush runserver --default-server=builtin 8080 &>/dev/null &
@@ -106,11 +105,11 @@ before_script:
   # Start Selenium and dump its ginormous log into a temporary file.
   - jdk_switcher use oraclejdk8
   - mkdir tmp
-  - selenium-server-standalone -port 4444 -log tmp/selenium2.log &
+  - selenium-server-standalone -port 4444 -log selenium.log &
   - sleep 5
 
 script:
-  - behat --strict --stop-on-failure --config ./sites/default/files/behat.yml --tags=${TEST_TAGS}
+  - behat --config .behat.yml --tags=${TEST_TAGS}
 
 matrix:
   fast_finish: true
